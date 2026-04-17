@@ -14,7 +14,7 @@ except Exception:
     HAVE_KEYBOARD = False
 
 # ---------------- CONFIG ----------------
-IP_PREFIX = "192.168.137."
+IP_PREFIX = "192.168.1."
 IP_START = 2
 IP_END = 255
 
