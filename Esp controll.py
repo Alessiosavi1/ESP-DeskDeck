@@ -12,8 +12,7 @@ try:
     HAVE_KEYBOARD = True
 except Exception:
     HAVE_KEYBOARD = False
-
-# ---------------- CONFIG ----------------
+
 IP_PREFIX = "192.168.1."
 IP_START = 2
 IP_END = 255
@@ -28,7 +27,6 @@ POLL_SEC = 0.25
 POLL_TIMEOUT_SEC = 2
 
 ENABLE_OPEN_SITE = True  # <-- RIATTIVATO
-# ----------------------------------------
 
 last_id = 0
 
@@ -54,8 +52,7 @@ def media(action: str):
 def safe_open_url(url: str):
     url = (url or "").strip()
     if not url:
-        return
-    # consenti solo http/https
+        return
     try:
         u = urlparse(url)
         if u.scheme not in ("http", "https"):
