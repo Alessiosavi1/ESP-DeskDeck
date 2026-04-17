@@ -8,8 +8,8 @@
 #include <time.h>
 #include <math.h>
 
-const char* ssid_casa = "TIM-69452625";
-const char* pass_casa = "TTRAX2UhC5XcdXd3kDQZGYD3";
+const char* ssid_casa = "YOUR-WIFI-SSID";
+const char* pass_casa = "YOUR-WIFI-PASSW";
 const char* ap_ssid   = "ESP32-Meteo-Config";
 const char* ap_pass   = "12345678";
 
