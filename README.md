@@ -124,4 +124,4 @@ The Python script listens for commands from the ESP32 and executes them on your 
 
 ## License
 
-This project is licensed under the **GNU Affero General Public License v3.0**. See the [LICENSE](LICENSE) file for more details.
+This project is licensed under the **Copyright**. See the [LICENSE](LICENSE) file for more details.
