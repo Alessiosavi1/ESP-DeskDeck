@@ -3,7 +3,15 @@ ESP-DeskDeck is a compact, DIY alternative to commercial macro-pads. Built aroun
 
 The device is fully configurable through a modern web interface hosted directly on the ESP32.
 
-https://www.star-history.com/?repos=Alessiosavi1%2FESP-DeskDeck&type=date&legend=top-left
+## Star History
+
+<a href="https://www.star-history.com/?repos=Alessiosavi1%2FESP-DeskDeck&type=date&legend=top-left">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=Alessiosavi1/ESP-DeskDeck&type=date&theme=dark&legend=top-left" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=Alessiosavi1/ESP-DeskDeck&type=date&legend=top-left" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=Alessiosavi1/ESP-DeskDeck&type=date&legend=top-left" />
+ </picture>
+</a>
 
 ## Features
 
