@@ -3,6 +3,8 @@ ESP-DeskDeck is a compact, DIY alternative to commercial macro-pads. Built aroun
 
 The device is fully configurable through a modern web interface hosted directly on the ESP32.
 
+https://www.star-history.com/?repos=Alessiosavi1%2FESP-DeskDeck&type=date&legend=top-left
+
 ## Features
 
 - **Ambient Information Display**:
