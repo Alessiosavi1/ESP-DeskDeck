@@ -13,6 +13,7 @@ The device is fully configurable through a modern web interface hosted directly 
  </picture>
 </a>
 
+
 ## Features
 
 - **Ambient Information Display**:
