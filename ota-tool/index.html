@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ESP-DeskDeck OTA Tool</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    background: #0d0d0d;
+    color: #e0e0e0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .container {
+    width: 100%;
+    max-width: 800px;
+    padding: 32px;
+  }
+  .header {
+    text-align: center;
+    margin-bottom: 36px;
+  }
+  .header h1 {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 2rem;
+    background: linear-gradient(135deg, #f5af19, #f12711);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 700;
+  }
+  .header p {
+    color: #888;
+    margin-top: 6px;
+    font-size: 0.9rem;
+  }
+  .card {
+    background: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 16px;
+    backdrop-filter: blur(10px);
+  }
+  .card-title {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #666;
+    margin-bottom: 16px;
+  }
+  .form-row {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+  }
+  .form-group {
+    flex: 1;
+    min-width: 180px;
+  }
+  .form-group label {
+    display: block;
+    font-size: 0.8rem;
+    color: #888;
+    margin-bottom: 4px;
+  }
+  select, input {
+    width: 100%;
+    padding: 10px 14px;
+    background: #252525;
+    border: 1px solid #444;
+    border-radius: 10px;
+    color: #e0e0e0;
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  select:focus, input:focus {
+    border-color: #f5af19;
+  }
+  select { cursor: pointer; }
+  select option { background: #1a1a1a; }
+
+  .actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    flex: 1;
+    min-width: 120px;
+  }
+  .btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+  .btn-build {
+    background: #2d2d2d;
+    color: #e0e0e0;
+    border: 1px solid #555;
+  }
+  .btn-build:hover:not(:disabled) { background: #3d3d3d; }
+  .btn-upload {
+    background: linear-gradient(135deg, #f5af19, #e07a10);
+    color: #000;
+  }
+  .btn-upload:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 4px 20px rgba(245, 175, 25, 0.3); }
+  .btn-all {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: #fff;
+  }
+  .btn-all:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3); }
+  .btn-stop {
+    background: #e74c3c;
+    color: #fff;
+  }
+  .btn-stop:hover:not(:disabled) { background: #c0392b; }
+
+  .log-container {
+    background: #111;
+    border: 1px solid #333;
+    border-radius: 12px;
+    padding: 16px;
+    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+    font-size: 0.8rem;
+    line-height: 1.6;
+    max-height: 350px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .log-container:empty::before {
+    content: '⏎ Pronto — scegli un\'azione...';
+    color: #555;
+    font-style: italic;
+  }
+  .log-line { color: #a0a0a0; }
+  .log-line.error { color: #e74c3c; }
+  .log-line.success { color: #2ecc71; }
+  .log-line.info { color: #f5af19; }
+
+  .status-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 12px;
+    font-size: 0.8rem;
+    color: #666;
+  }
+  .status-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #2ecc71;
+  }
+  .status-dot.busy { background: #f5af19; animation: pulse 1s infinite; }
+  .status-dot.error { background: #e74c3c; }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  .badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 0.7rem;
+    font-weight: 600;
+  }
+  .badge-ota { background: #2ecc7133; color: #2ecc71; border: 1px solid #2ecc7144; }
+  .badge-usb { background: #3498db33; color: #3498db; border: 1px solid #3498db44; }
+
+  @media (max-width: 600px) {
+    .container { padding: 16px; }
+    .card { padding: 16px; }
+    .form-row { flex-direction: column; }
+    .actions { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>ESP-DeskDeck</h1>
+    <p>OTA Firmware Updater</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title">⚙️ Configurazione</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label for="envSelect">Board / Environment</label>
+        <select id="envSelect" onchange="onEnvChange()">
+          <option value="">Caricamento...</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="ipInput">IP / Hostname ESP</label>
+        <input type="text" id="ipInput" value="esp-deskdeck.local" placeholder="es. 192.168.1.42">
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🚀 Azioni</div>
+    <div class="actions">
+      <button class="btn btn-build" id="btnBuild" onclick="runAction('build')">⚙️ Compila</button>
+      <button class="btn btn-upload" id="btnUpload" onclick="runAction('upload')">📡 Upload</button>
+      <button class="btn btn-all" id="btnAll" onclick="runAction('all')">⚡ Compila + Upload</button>
+      <button class="btn btn-stop" id="btnStop" onclick="stopAction()" style="display:none">⏹ Ferma</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📋 Output</div>
+    <div class="log-container" id="logOutput"></div>
+    <div class="status-bar">
+      <span class="status-dot" id="statusDot"></span>
+      <span id="statusText">In attesa</span>
+    </div>
+  </div>
+</div>
+
+<script>
+let currentSession = null;
+let eventSource = null;
+
+async function loadEnvs() {
+  const res = await fetch('/api/envs');
+  const envs = await res.json();
+  const sel = document.getElementById('envSelect');
+  sel.innerHTML = '';
+  envs.forEach(e => {
+    const opt = document.createElement('option');
+    opt.value = e.name;
+    const badge = e.ota ? '🔄 OTA' : '🔌 USB';
+    opt.textContent = `[${badge}] ${e.name} (${e.board})`;
+    if (e.ota || e.name.toLowerCase().includes('ota')) opt.selected = true;
+    sel.appendChild(opt);
+  });
+}
+loadEnvs();
+
+function onEnvChange() {
+  const sel = document.getElementById('envSelect');
+  const isOTA = sel.options[sel.selectedIndex]?.text?.includes('OTA');
+  document.querySelectorAll('.btn-upload, .btn-all').forEach(b => b.disabled = !isOTA);
+}
+
+async function runAction(action) {
+  const env = document.getElementById('envSelect').value;
+  const ip = document.getElementById('ipInput').value.trim();
+
+  if (!env) { alert('Seleziona un environment'); return; }
+  if ((action === 'upload' || action === 'all') && !ip) { alert('Inserisci IP/hostname'); return; }
+
+  setBusy(true);
+  document.getElementById('logOutput').textContent = '';
+  appendLog('✦ Avvio ' + action + ' su [' + env + ']...\n', 'info');
+
+  const res = await fetch('/api/run', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ env, ip, action })
+  });
+  const data = await res.json();
+  currentSession = data.session;
+
+  // Connect to SSE stream
+  eventSource = new EventSource('/api/stream?session=' + currentSession);
+  eventSource.onmessage = (e) => {
+    const text = e.data.replace(/\\n/g, '\n');
+    appendLog(text);
+  };
+  eventSource.addEventListener('done', () => {
+    eventSource.close();
+    setBusy(false);
+    currentSession = null;
+    appendLog('\n✨ Completato!\n', 'success');
+  });
+  eventSource.onerror = () => {
+    // Will reconnect automatically
+  };
+}
+
+function stopAction() {
+  if (eventSource) { eventSource.close(); eventSource = null; }
+  setBusy(false);
+  appendLog('\n⏹ Fermato dall\'utente\n', 'error');
+}
+
+function appendLog(text, type = '') {
+  const el = document.getElementById('logOutput');
+  const lines = text.split('\n');
+  lines.forEach(line => {
+    if (!line && !el.textContent) return;
+    const div = document.createElement('div');
+    div.className = 'log-line' + (type ? ' ' + type : '');
+    div.textContent = line || ' ';
+    el.appendChild(div);
+  });
+  el.scrollTop = el.scrollHeight;
+}
+
+function setBusy(busy) {
+  document.getElementById('btnBuild').disabled = busy;
+  document.getElementById('btnUpload').disabled = busy;
+  document.getElementById('btnAll').disabled = busy;
+  document.getElementById('btnStop').style.display = busy ? 'block' : 'none';
+  const dot = document.getElementById('statusDot');
+  const text = document.getElementById('statusText');
+  dot.className = 'status-dot' + (busy ? ' busy' : '');
+  text.textContent = busy ? 'In esecuzione...' : 'In attesa';
+}
+</script>
+</body>
+</html>
