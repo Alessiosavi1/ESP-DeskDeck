@@ -57,7 +57,22 @@ python pc_control.py
 
 Lo script trova l'ESP **automaticamente** via mDNS — niente configurazione IP!
 
-### 3. OTA Updates
+### 3. OTA Tool (Windows)
+
+Scarica **`ESP-DeskDeck-OTA-Tool.exe`** dalla release o dalla cartella `ota-tool/` nel repo.
+
+Basta doppio click — si apre una UI nel browser:
+
+```bash
+# O in alternativa dalla cartella del progetto:
+ota-tool/ESP-DeskDeck-OTA-Tool.exe
+```
+
+1. Seleziona la board
+2. Inserisci IP/hostname (default: `esp-deskdeck.local`)
+3. Click su **Compila + Upload**
+
+### 4. OTA Updates (via CLI)
 
 Dopo il primo flashing via USB, puoi aggiornare via WiFi:
 
