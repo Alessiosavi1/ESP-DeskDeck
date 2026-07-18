@@ -8,6 +8,10 @@
 #include <time.h>
 #include <math.h>
 
+// --- Nuove funzionalità ---
+#include <ESPmDNS.h>      // mDNS: esp-deskdeck.local
+#include <ArduinoOTA.h>   // OTA updates via WiFi
+
 const char* ssid_casa = "YOUR-WIFI-SSID";
 const char* pass_casa = "YOUR-WIFI-PASSW";
 const char* ap_ssid   = "ESP32-Meteo-Config";
@@ -1248,6 +1252,29 @@ void setup() {
     mostraMessaggio("WiFi OK!", WiFi.localIP().toString());
     delay(1200);
     configTime(3600, 3600, "pool.ntp.org");
+
+    // --- mDNS ---
+    if (MDNS.begin("esp-deskdeck")) {
+      Serial.println("[mDNS] esp-deskdeck.local avviato");
+      MDNS.addService("http", "tcp", 80);
+    }
+
+    // --- OTA ---
+    ArduinoOTA.setHostname("esp-deskdeck");
+    ArduinoOTA.onStart([]() {
+      String type = (ArduinoOTA.getCommand() == U_FLASH) ? "sketch" : "filesystem";
+      Serial.println("[OTA] Inizio aggiornamento " + type);
+    });
+    ArduinoOTA.onEnd([]() { Serial.println("[OTA] Fine!"); });
+    ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
+      Serial.printf("[OTA] Progresso: %u%%\r", (progress * 100) / total);
+    });
+    ArduinoOTA.onError([](ota_error_t error) {
+      Serial.printf("[OTA] Errore %d\n", error);
+    });
+    ArduinoOTA.begin();
+    Serial.println("[OTA] Pronto per aggiornamenti via WiFi");
+
     prendiMeteo();
   } else {
     mostraMessaggio("WiFi OFF", "AP: 192.168.4.1");
@@ -1271,6 +1298,7 @@ void setup() {
 void loop() {
   gestisciTasti();
   server.handleClient();
+  ArduinoOTA.handle();       // OTA updates
 
   static unsigned long ultimoTickOra = 0;
   if (modalitaAttuale == ORA && millis() - ultimoTickOra >= 1000) {

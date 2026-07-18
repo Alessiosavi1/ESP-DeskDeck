@@ -1,0 +1,31 @@
+name: PlatformIO CI
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+    branches: [master, main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install PlatformIO
+        run: pip install platformio
+
+      - name: Build firmware (USB)
+        run: pio run -e esp32-c3-dev
+
+      - name: Build firmware (OTA)
+        run: pio run -e esp32-c3-dev-ota
+
+      - name: Check Python script syntax
+        run: python3 -m py_compile pc_control.py
